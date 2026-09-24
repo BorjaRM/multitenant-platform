@@ -1,0 +1,45 @@
+name: spike-validation
+
+on:
+  push:
+    paths:
+      - 'specs/**'
+      - 'test/**'
+      - 'packages/**'
+      - 'infrastructure/**'
+      - 'scripts/**'
+      - '.github/**'
+      - 'package*.json'
+      - 'tsconfig.json'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-spike:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm ci
+      - name: Start PostgreSQL
+        run: npm run db:up
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Run traceability check
+        run: npm run test:traceability
+      - name: Run integration tests
+        run: npm test
+      - name: Repeat integration tests
+        run: npm test
+      - name: Detect security mutations
+        run: npm run test:mutations
+      - name: Stop disposable CI environment
+        if: always()
+        run: docker compose -f infrastructure/postgres/compose.yml down -v

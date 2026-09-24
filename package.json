@@ -1,0 +1,32 @@
+{
+  "scripts": {
+    "db:up": "docker compose -f infrastructure/postgres/compose.yml up -d --wait",
+    "db:down": "docker compose -f infrastructure/postgres/compose.yml down",
+    "db:status": "docker compose -f infrastructure/postgres/compose.yml ps",
+    "db:logs": "docker compose -f infrastructure/postgres/compose.yml logs -f postgres",
+    "db:migrate": "npm run db:bootstrap && node scripts/database.cjs",
+    "test:integration:checkpoint-1": "node scripts/test-integration.cjs 1",
+    "test:integration:checkpoint-2": "node scripts/test-integration.cjs 2",
+    "db:bootstrap": "docker compose -f infrastructure/postgres/compose.yml exec -T postgres psql -v ON_ERROR_STOP=1 -U postgres -d fitness_ops -f /docker-entrypoint-initdb.d/01-roles.sql",
+    "test": "node scripts/test-integration.cjs",
+    "typecheck": "tsc --noEmit",
+    "test:mutations": "node scripts/test-mutations.cjs",
+    "test:traceability": "tsx .github/skills/execute-tenancy-spike/scripts/verify-traceability.ts",
+    "test:integration:checkpoint-3": "node scripts/test-integration.cjs 3",
+    "test:integration:checkpoint-4": "node scripts/test-integration.cjs 4",
+    "test:integration:checkpoint-5": "node scripts/test-integration.cjs 5",
+    "test:integration:checkpoint-6": "node scripts/test-integration.cjs 6"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "@types/pg": "^8.23.1",
+    "markdown-it": "^15.0.2",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "yaml": "^2.9.0"
+  }
+}
